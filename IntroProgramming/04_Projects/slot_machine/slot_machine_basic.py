@@ -8,7 +8,6 @@ import random
 import subprocess
 import platform
 
-jackpot = 1000
 
 payouts = {
     "7": 10,
@@ -29,7 +28,7 @@ def clear_terminal():
 
 
 def spin_slots():
-    slot_items = ["CHERRY", "LEMON", "ORANGE", "PLUM", "BELL", "BAR", "7"]
+    slot_items = ["7", "BELL", "BAR", "PLUM", "ORANGE", "LEMON", "CHERRY"]
     return (
         str(random.choice(slot_items)),
         str(random.choice(slot_items)),
@@ -42,25 +41,23 @@ def play_slots(balance):
     try:
         play = float(user_input)
         if play == 0:
-            print(f"\nYour total winnings are: ${balance}")
             return 0
         if play < 0:
             print("\nPlease enter a number greater than 0.")
-            return None
         if play > balance:
             print("\nYou don't have enough balance.")
-            return None
         balance -= play
         return play, balance
     except ValueError:
         print(
             f'\n"{user_input}" is an invalid entry, enter a number greater than 0 to play.'
         )
-        return None
 
 
-def calculate_score(slot_one, slot_two, slot_three, bet):
+def calculate_score(slot_one, slot_two, slot_three, bet, jackpot):
     if slot_one == slot_two == slot_three:
+        if slot_one == "7":
+            return jackpot
         muliplier = payouts[slot_one]
         return muliplier * bet
     else:
@@ -69,6 +66,7 @@ def calculate_score(slot_one, slot_two, slot_three, bet):
 
 def main():
     balance = 100
+    jackpot = 1000
     while True:
         print(f"\nYour total balance is ${balance}")
         result = play_slots(balance)
@@ -81,7 +79,7 @@ def main():
         print(f"\nYou have bet a total of {play}")
         one, two, three = spin_slots()
         print(f"\n{one}-{two}-{three}")
-        winnings = calculate_score(one, two, three, play)
+        winnings = calculate_score(one, two, three, play, jackpot)
 
         if winnings > 0:
             print(f"\nYou have won ${winnings}!")
@@ -91,7 +89,7 @@ def main():
         balance += winnings
 
         if balance <= 0:
-            print("You have lost all of your money, maybe quit gambling!")
+            print("You have lost all of your money, quit gambling!")
             break
         input("\nPress enter to continue....")
         clear_terminal()
